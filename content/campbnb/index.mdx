@@ -1,0 +1,143 @@
+---
+title: "Building a fullstack web app for AirBnB-style campsite reservation with machine learning algo"
+description: "To tackle the lack of a specialized platform for campsite reservation, this project integrates MVN-architecture with AWS serverless architecture, Stripe API & builds a recommendation system from scratch."
+image: "../../public/blogs/1000_F_398408157_McCktDBclnNQ1VPPTO03kQF9eZRG80SL.png"
+publishedAt: "2024-10-08"
+updatedAt: "2024-10-08"
+author: "Chee"
+isPublished: true
+tags:
+- fullstack development
+- machine learning
+---
+
+
+
+According to the 2023 North American Camping & Outdoor Hospitality Report, there has been year-on-year growth in the number of active camping households domestically (Kampgrounds of America Inc, 2024) [[1]](#1).  However, the online reservation industry has been experiencing an undersupply of reservation platforms that cater to private campsite reservations.  
+
+<Image
+  src="/blogs/Screenshot 2024-10-06 212412.png"
+  width="718"
+  height="404"
+  alt="Image"
+  sizes="100vw"
+/>
+
+In terms of camping location, there are 2 primary types – government run, such as state and national parks, and privately operated, often adjacent to state and federal lands (Parfitt, D., 2017) [[2]](#2).  There is reportedly 429 national parks and more than 12,000 private campgrounds across the United States (US) (National Park Service, 2024).  While campers go through the national park system’s platform for reservation of national camping sites, they rely on disparate sources of reservation websites to navigate and compare different private campsites to book an ideal place.  Moreover, there is a limited availability of these websites, unlike in the hotel or private accommodation industry.
+
+| Supply & demand data (2023)                | Hotels/private guest accommodations in US        | Private campgrounds in US           |
+| ----------------------- | ------------ | ------------------ |
+| No. of property listings  | 107, 902 (IBISWorld, 2024)  | 15,466 (IBISWorld, 2024)       |
+| No. of est. annual active users | 153.86 million   | 58.5 million |
+| Number of third-party reservation platforms            | 4,264 (IBISWorld, 2024) | 100         |
+| Estimated market size of reservation business in 2024                   | $47.1billion   | $23.3billion         |
+
+
+> Why is Tailwind removing the default styles on my `h1` elements? How do I disable this? What do you mean I lose all the other base styles too?
+> We hear you, but we're not convinced that simply disabling our base styles is what you really want. You don't want to have to remove annoying margins every time you use a `p` element in a piece of your dashboard UI. And I doubt you really want your blog posts to use the user-agent styles either — you want them to look _awesome_, not awful.
+
+The `@tailwindcss/typography` plugin is our attempt to give you what you _actually_ want, without any of the downsides of doing something stupid like disabling our base styles.
+
+It adds a new `prose` class that you can slap on any block of vanilla HTML content and turn it into a beautiful, well-formatted document:
+
+```html showLineNumbers {1-3,4} /science/ title="index.html" caption="this file contains html code"
+<article className="prose">
+  <h1>Garlic bread with cheese: What the science tells us</h1>
+  <p>
+    For years parents have espoused the health benefits of eating garlic bread
+    with cheese to their children, with the food earning such an iconic status
+    in our culture that kids will often dress up as warm, cheesy loaf for
+    Halloween.
+  </p>
+  <p>
+    But a recent study shows that the celebrated appetizer may be linked to a
+    series of rabies cases springing up around the country.
+  </p>
+</article>
+```
+
+For more information about how to use the plugin and the features it includes, [read the documentation](https://github.com/tailwindcss/typography/blob/master/README.md).
+
+---
+
+## Architecture
+### Architecture diagram
+<Image
+  src="/blogs/architecture.png"
+  width="718"
+  height="404"
+  alt="Image"
+  sizes="100vw"
+/>
+### Conceptual class diagram
+<Image
+  src="/blogs/conceptualclassdiagram.png"
+  width="718"
+  height="404"
+  alt="Image"
+  sizes="100vw"
+/>
+#### Demo
+<img src='/blogs/Animation2.gif' title='Video Walkthrough'   width="718"
+  height="404"
+  alt="video"
+  sizes="100vw" />
+
+## Recommendation system
+
+### ML KNN algorithm
+
+The campground controller’s giveRecommendations function generates campground recommendations for users based on various factors such as their reservation history, favorite campgrounds, and the rating ranking of campgrounds.
+For users not signed in, it generates recommendations based on rating ranking.  Here, it uses the sort algorithm to sort campgrounds based on average rating of each campground, callable by an instance method, getRating in the schema.
+For signed-in users, it uses the K-nearest neighbors (KNN) algorithm.  First, it learns from data formatted from existing campgrounds’s weighted average score based on amenities and rating.  Each amenity is scored 1.  Available amenities are ‘yurk’, ‘stargazing tour’, ‘zipline, kitchen’, ‘hiking tour’, ‘foodtruck’, ‘breakfast’, ‘fishing tour’, ‘premium yurt’, ‘live music’, and ‘yoga class’.
+
+$$weighted average score=  ((rating*rating weight)+∑▒〖(Amenity score*amenity weight)〗)\div(total weight)$$
+
+
+Currently, the rating weight and the total amenities' relative weight are equal, each accounting for half of the overall weight.  Depending on the future market situation, weights would be adjusted.
+Next, it predicts the campground IDs for new data points which are derived from user data, which are existing favorites array of campgrounds and reservation history.  Finally, it returns the recommended campgrounds based on these data.  If there are no unique recommendation campground IDs, the function which fall back to the ranking data as recommendation.  The algorithm can be adjusted based on selection of the ‘k’ number, which controls the trade-off between model complexity and generalization performance.
+
+
+
+### Implementation:
+<Image
+  src="/blogs/knnresult.png"
+  width="718"
+  height="404"
+  alt="Image"
+  sizes="100vw"
+/>
+```html title="campgrounds.js" caption="this file contains javascript codes"
+
+const knn = require('knear');
+  function recommendCampgrounds(campgrounddata) {
+    const machine = new knn.kNear(10); // Adjust k value as needed
+    for (let data of formattedData) {
+      machine.learn(data.features, data.label);
+    }
+    const recommendations = new Set();
+    for (let data of campgrounddata) {
+
+      let prediction = machine.classify(data.features); // Use relevant feature(s) from favorites
+      console.log('prediction: ', prediction)
+      recommendations.add(prediction)
+    }
+    // Convert Set to array and remove already favorited campgrounds
+    console.log('recommendations', recommendations)
+    const uniqueRecommendations = [...recommendations].filter(campgroundId =>
+      !campgrounddata.some(data => data.label.equals(campgroundId))
+    );
+    //const prediction=machine.classify([1,9])
+    console.log('uniqueRecommendations', uniqueRecommendations)
+    return uniqueRecommendations;
+    //return prediction
+  }
+
+```
+
+## References
+<a id="1">[1]</a>	Kampgrounds of America Inc, 2024, 2023 North American Camping & Outdoor Hospitality Report, United States, viewed February 1 2024, http://koa.uberflip.com/i/1497941-2023-north-american-camping-outdoor-hospitality-report/ 
+
+<a id="2">[2]</a>		Parfitt, D., Jun 13 2017, U.S. National Park Campgrounds Tip: Public vs. Private, viewed Mar 1 2024, https://www.huffpost.com/entry/us-national-park-campgrounds-tip-public-vs-private_b_593fdc85e4b0b65670e56dca
+
+<a id="3">[3]</a> Repo: https://github.com/YeeCheeYong/campbnb

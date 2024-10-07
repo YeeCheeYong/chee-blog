@@ -1,0 +1,32 @@
+---
+title: "NLP-Powered inventory management system"
+description: "Leverage Google DialogFlow's Natural language processing to process user's queries about inventory"
+image: "../../public/blogs/digital-binary-code-streaming-data-wallpaper-design_1017-54536.jpg"
+publishedAt: "2024-10-07"
+updatedAt: "2024-10-07"
+author: "Chee"
+isPublished: true
+tags:
+
+- machine learning
+- nlp
+- java
+- fullstack development
+---
+The main objective of the project is to automate inventory management tasks through an intuitive, user-friendly chatbot powered by Telegram’s API and Google's Dialogflow. The chatbot can handle customer queries such as checking stock levels or order statuses and return precise, personalized responses. This allows businesses to operate more efficiently by reducing human involvement in routine inventory management tasks while ensuring real-time updates to the system.
+
+## Key Features
+### Telegram API-Powered Chatbot
+The system uses Telegram's API as a communication channel for users to interact with the inventory management system. This chatbot acts as a virtual assistant that receives natural language queries from users, such as “What’s the stock status of Product X?” or “When will my order arrive?”, and automatically processes these queries.
+
+### NLP Processing with Dialogflow
+To interpret user queries, the system integrates Dialogflow, a powerful NLP platform by Google. Dialogflow processes and understands user intents, allowing the chatbot to extract relevant information from the input. For instance, when a user asks about stock availability, Dialogflow identifies the product being queried and the action requested, enabling personalized and accurate responses.
+
+### Real-Time SQL Query Processing
+Once Dialogflow determines the user’s intent, the system queries the PostgreSQL database to retrieve the required information (e.g., stock levels or order status). The backend, built using Java and Spring Boot, ensures real-time query processing with sub-second latency. This allows the system to instantly fetch and display up-to-date information to the user, providing an efficient, seamless user experience.
+
+### Automated Updates to Database and UI
+Every query processed by the system not only checks the database but also ensures that any critical updates (such as changes in stock levels) are reflected immediately. The backend communicates with the React-based user interface (UI) to reflect changes in real time, ensuring that the inventory manager and users always have the most current information.
+## References
+
+<a id="1">[1]</a> Repo: https://github.com/YeeCheeYong/inventorymgmtsys
