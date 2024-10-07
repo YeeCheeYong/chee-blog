@@ -3,6 +3,7 @@
 const {withContentlayer} = require("next-contentlayer")
 
 const nextConfig = {
+  reactStrictMode: false,
     compiler:{
         removeConsole: true,
     }
