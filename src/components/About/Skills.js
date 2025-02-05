@@ -33,7 +33,7 @@ const Skills = () => {
         })}
       </ul>      
       <span className="font-semibold text-lg sm:text-3xl md:text-4xl text-accent dark:text-accentDark">
-        See my resume         <a href="https://drive.google.com/file/d/1Z18PQjI-QIaLqVRhOZx3DVEM8KMlnqjJ/view?usp=sharing" className="underline" target="_blank">
+        See my resume         <a href="https://drive.google.com/file/d/1jGbF3EUXPkwXwNlJmkw5c8_8_43qmSCn/view?usp=sharing" className="underline" target="_blank">
             here
           </a>.  See my projects from the Home tab.
       </span>
